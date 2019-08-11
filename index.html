@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>leecho_memo</title>
+    <link rel="stylesheet" href="./src/css/app.css">
+</head>
+
+<body>
+<header class="header-wrapper">
+    <h1 class="header__text"><strong>메모장</strong></h1>
+    <div class="header__info">
+        <span class="header__user-name"></span>
+        <span class="header__thumb">
+            <img src="./src/images/thumb.png" alt="" class="header__user-img">
+        </span>
+    </div>
+    <div class="header__action">
+        <button class="header__action-button" data-action="save">저장</button>
+        <button class="header__action-button" data-action="cancel">취소</button>
+    </div>
+</header>
+
+
+<main class="container">
+    <section class="memo-wrapper">
+        <div class="memo-write-area">
+            <div class="memo">
+                <div class="memo__info">
+                    <div class="memo__info-text"></div>
+                    <div class="memo__info-button-wrap">
+                        <button type="button" class="memo__button memo__button--favorite">즐겨찾기</button>
+                        <button type="button" class="memo__button memo__button--delete">삭제</button>
+                    </div>
+                </div>
+                <div class="memo__head memo--write" data-field="title" contenteditable="true">제목을 입력해주세요.</div>
+                <div class="memo__body memo--write" data-field="contents" contenteditable="true">내용을 입력해주세요.</div>
+            </div>
+        </div>
+
+        <div class="memo-list-area"></div>
+    </section>
+</main>
+
+
+<footer class="footer-wrapper">
+    <p class="footer__copyright">All Rights leecho.</p>
+</footer>
+<script src="./src/js/helper.js"></script>
+<script src="./src/js/model.js"></script>
+<script src="./src/js/view.js"></script>
+<script src="./src/js/controller.js"></script>
+<script src="./src/js/app.js"></script>
+</body>
+</html>
