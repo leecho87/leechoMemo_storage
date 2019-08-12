@@ -1,6 +1,8 @@
 (function(exports){
     'use strict';
 
+    var tag = '[View]';
+
     function View(model){
         this.ENTER_CODE = 13;
         this.model = model;
@@ -8,14 +10,8 @@
         this.titlePlaceholder = '제목을 입력해주세요.';
         this.contentsPlaceholder = '내용을 입력해주세요.';
 
-        this.$actionButtonArea = qs('.header__action');
-        this.$actionButtonSave = qs('[data-action="save"]');
-        this.$actionButtonCancel = qs('[data-action="cancel"]');
-        this.$writeArea = qsa('.memo--write');
-        this.$memolist = qs('.memo-list-area');
-
-        this.defaultMemo =
-        `<div class="memo" data-id="{{id}}">
+        this.defaultTemplate =
+        `<div class="memo">
             <div class="memo__info">
                 <div class="memo__info-text">{{date}}</div>
                 <div class="memo__info-button-wrap">
@@ -24,7 +20,7 @@
                 </div>
             </div>
             <div class="memo__head">{{title}}</div>
-            <div class="memo__body">{{contents}}, {{favorite}}, {{timelog}}</div>
+            <div class="memo__body">{{contents}}</div>
         </div>`;
 
         this.palette =
@@ -41,10 +37,25 @@
             <a href="#" class="palette__item palette__item--10" data-color="10"></a>
             <button type="button" class="palette__button">닫기</button>
         </section>`;
+
+        this.pickElements();
+    }
+
+    View.prototype.pickElements = function(){
+        this.$actionButtonArea = qs('.header__action');
+        this.$actionButtonSave = qs('[data-action="save"]');
+        this.$actionButtonCancel = qs('[data-action="cancel"]');
+        this.$writeArea = qsa('.memo--write');
+        this.$writeTitle = qsa('.memo__head.memo--write');
+        this.$writeContents = qsa('.memo__body.memo--write');
+        this.$memoList = qs('.memo-list-area');
+        this.$memoFavorite = qsa('.memo__button--favorite');
+        this.$memoDelete = qsa('.memo__button--delete');
     }
 
     View.prototype.bind = function(event, handler){
         var self = this;
+
         if( event === 'focusin' ){
             $multipleEvent(self.$writeArea, 'focus', function(event){
                 self.draw('labelFocus', event)
@@ -59,11 +70,18 @@
             });
         }else if( event === 'newMemo' ){
             $on(self.$actionButtonSave, 'click', function(){
-                handler({
-                    title : qs('[data-field="title"]').textContent,
-                    contents : qs('[data-field="contents"]').textContent
-                })
+                handler(
+                    qs('[data-field="title"]').textContent,
+                    qs('[data-field="contents"]').textContent
+                )
+            });
+        }else if ( event === 'memoRemove' ){
+            $multipleEvent(self.$memoDelete, 'click', function(event){
+                self.draw('delete', event)
             })
+            // $delegate(self.$memoList, '.memo__button--delete', 'click', function () {
+			// 	console.log('??')
+			// });
         }
     }
 
@@ -81,13 +99,16 @@
                 self.$actionButtonArea.classList.add('on');
             },
             focusout : function(){
-                var target = event.target;
-                var targetField = target.dataset.field;
+                var titleField = qs('[data-field="title"]');
+                var contentsField = qs('[data-field="contents"]');
 
-                if( !target.textContent && targetField === 'title' ){
-                    target.textContent = self.titlePlaceholder;
-                }else if( !target.textContent && targetField === 'contents' ){
-                    target.textContent = self.contentsPlaceholder;
+                if( !titleField.textContent ){
+                    titleField.textContent = self.titlePlaceholder;
+                }else if( !contentsField.textContent ){
+                    contentsField.textContent = self.contentsPlaceholder;
+                }
+
+                if( titleField.textContent === self.titlePlaceholder && contentsField.textContent === self.contentsPlaceholder ){
                     self.$actionButtonArea.classList.remove('on');
                 }
             },
@@ -98,36 +119,40 @@
                     qs('[data-field="contents"]').focus();
                 }
             },
-            save : function(){
-                var target = event.target;
-                var title = qs('[data-field="title"]').textContent;
-                var contents = qs('[data-field="contents"]').textContent;
-                //console.log('view, save, title = ' ,title)
-                //console.log('view, save, contents = ' ,contents)
+            clear : function(){
+                for(var i=0; i<self.$writeArea.length; i++){
+                    self.$writeArea[i].innerHTML = '';
+                }
             },
-            show : function(){
-                self.$memolist.innerHTML = self.generateMemo(param);
+            delete : function(){
+                var target = event.target;
+                var targetID = target.dataset.id;
+                console.log('[draw] delete target', target)
+                console.log('[draw] delete targetID', targetID)
             }
         };
         eventCommand[command]();
     }
 
-    View.prototype.generateMemo = function(data){
-        var view = ``;
-        for(var i=0; i<data.length; i++){
-            var template = this.defaultMemo;
-
-            template = template.replace('{{id}}', i);
-            template = template.replace('{{title}}', data[i].title);
-            template = template.replace('{{contents}}', data[i].contents);
-            template = template.replace('{{favorite}}', data[i].favorite);
-            template = template.replace('{{date}}', data[i].timelog);
-
-            view = view + template;
+    View.prototype.generator = function(data){
+        var self = this;
+        var memo = '';
+        for( var i=0; i<data.length; i++ ){
+            var template = this.defaultTemplate;
+                template = template.replace('{{id}}', data[i].id);
+                template = template.replace('{{date}}', data[i].timelog);
+                template = template.replace('{{title}}', data[i].title);
+                template = template.replace('{{contents}}', data[i].contents);
+            memo = memo + template;
         }
-        return view;
+        return memo;
     }
 
+    View.prototype.render = function(data){
+        var self = this;
+        self.$memoList.innerHTML = self.generator(data);
+        self.pickElements();
+    }
 
     exports.app = exports.app || {};
     exports.app.View = View;

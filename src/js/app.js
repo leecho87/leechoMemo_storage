@@ -8,4 +8,10 @@
     }
 
     var leechoMemo = new App('memo');
+
+    function initialize(){
+        leechoMemo.controller.refresh();
+    }
+
+    $on(window, 'load', initialize);
 })();

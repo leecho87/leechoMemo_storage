@@ -1,6 +1,8 @@
 (function(exports){
     'use strict';
 
+    var tag = '[Model]';
+
     function Model(name){
         this.dbName = name;
         if(!localStorage.getItem(name)){
@@ -23,13 +25,22 @@
             time :
                 (function(date){
                     return [
-                        date.getHours(),
-                        date.getMinutes(),
-                        date.getSeconds()
+                        $changeHour(date.getHours()),
+                        $pad(date.getMinutes()),
+                        $pad(date.getSeconds())
                     ].join(':');
+                })(new Date())
+            ,timeId :
+                (function(date){
+                    return date.getTime()
                 })(new Date())
         }
         return create[getter];
+    }
+
+    Model.prototype.read = function(callback){
+        var data = JSON.parse(localStorage.getItem(this.dbName));
+        callback(data);
     }
 
     Model.prototype.create = function(parameter, callback){
@@ -38,7 +49,8 @@
 
         parameter = {
             ...parameter,
-            timelog : `${self.timeLog('date')} / ${self.timeLog('time')}`,
+            id : self.timeLog('timeId'),
+            timelog : `${self.timeLog('date')}<br>${self.timeLog('time')}`,
             favorite : false
         }
 
@@ -46,6 +58,11 @@
         localStorage.setItem(this.dbName, JSON.stringify(data));
         callback(data);
     }
+
+    Model.prototype.delete = function(callback){
+        console.log()
+    }
+
     exports.app = exports.app || {};
     exports.app.Model = Model;
 })(window);

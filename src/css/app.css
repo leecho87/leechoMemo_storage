@@ -14,18 +14,27 @@
 .memo-write-area {
     float:left;
     width:300px;
-    margin-right:10px;
+    margin:0 10px 0 0;
 }
 .memo-write-area .memo {
     float:none;
     width:auto;
+    margin:0;
+}
+.memo-write-area .memo__body {
+    min-height:180px
+}
+.memo-list-area:after {
+    content:'';
+    display:block;
+    clear:both;
 }
 .memo {
     position:relative;
     float:left;
     box-sizing:border-box;
     width:300px;
-    margin:10px 0 0 10px;
+    margin:0 10px 10px 0;
     border-radius:12px;
     border:1px solid #ccc;
     background:#fbfbfc;
@@ -41,26 +50,21 @@
 .memo--8 {border-color:#e696d3;background-color:#ffa6ea}
 .memo--9 {border-color:#d3d3d7;background-color:#eaeaee}
 .memo--10 {border-color:#949b9c;background-color:#a4acad}
-
-.memo:nth-child(3n+1) {
-    margin-left:0;
-}
-.memo:nth-child(-n+3) {
-    margin-top:0
-}
 .memo--write {
     margin:0;
 }
 .memo__info {
     display:flex;
     padding:0 10px;
-    height:30px;
+    height:40px;
     border-bottom:1px solid #ccc;
     font-size:13px;
     color:#989898;
 }
 .memo__info-text {
-    flex:1
+    flex:1;
+    padding-top:5px;
+    font-size:11px;
 }
 .memo__info-button-wrap {
     flex:2;
