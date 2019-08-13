@@ -11,7 +11,7 @@
         this.contentsPlaceholder = '내용을 입력해주세요.';
 
         this.defaultTemplate =
-        `<div class="memo">
+        `<div class="memo" data-id="{{id}}">
             <div class="memo__info">
                 <div class="memo__info-text">{{date}}</div>
                 <div class="memo__info-button-wrap">
@@ -42,6 +42,7 @@
     }
 
     View.prototype.pickElements = function(){
+        this.$changeSelect = qs('.header__action-select');
         this.$actionButtonArea = qs('.header__action');
         this.$actionButtonSave = qs('[data-action="save"]');
         this.$actionButtonCancel = qs('[data-action="cancel"]');
@@ -56,32 +57,37 @@
     View.prototype.bind = function(event, handler){
         var self = this;
 
-        if( event === 'focusin' ){
+        if ( event === 'focusin' ) {
             $multipleEvent(self.$writeArea, 'focus', function(event){
                 self.draw('labelFocus', event)
             });
-        }else if( event === 'blur' ){
+        } else if ( event === 'blur' ) {
             $multipleEvent(self.$writeArea, 'blur', function(event){
                 self.draw('focusout', event)
             });
-        }else if( event === 'keyup' ){
+        } else if ( event === 'keyup' ) {
             $multipleEvent(self.$writeArea, 'keyup', function(event){
                 self.draw('keyup', event)
             });
-        }else if( event === 'newMemo' ){
+        } else if ( event === 'newMemo' ) {
             $on(self.$actionButtonSave, 'click', function(){
-                handler(
-                    qs('[data-field="title"]').textContent,
-                    qs('[data-field="contents"]').textContent
-                )
+                handler({
+                    title : qs('[data-field="title"]').textContent,
+                    contents : qs('[data-field="contents"]').textContent
+                })
             });
-        }else if ( event === 'memoRemove' ){
+        } else if ( event === 'memoRemove' ) {
             $multipleEvent(self.$memoDelete, 'click', function(event){
-                self.draw('delete', event)
+                handler(event);
             })
-            // $delegate(self.$memoList, '.memo__button--delete', 'click', function () {
-			// 	console.log('??')
-			// });
+        } else if ( event === 'memoFavorite' ) {
+            $multipleEvent(self.$memoFavorite, 'click', function(event){
+                handler(event);
+            })
+        } else if ( event === 'changeMemo' ) {
+            $on(self.$changeSelect, 'change', function(event){
+                handler(event);
+            })
         }
     }
 
@@ -113,38 +119,43 @@
                 }
             },
             keyup : function(){
-                var target = event.target;
+                var target = param.target;
                 var targetField = target.dataset.field;
                 if( event.keyCode === self.ENTER_CODE && targetField === 'title' ){
                     qs('[data-field="contents"]').focus();
                 }
             },
             clear : function(){
-                for(var i=0; i<self.$writeArea.length; i++){
-                    self.$writeArea[i].innerHTML = '';
-                }
+                var titleField = qs('[data-field="title"]');
+                    titleField.textContent = self.titlePlaceholder;
+                var contentsField = qs('[data-field="contents"]');
+                    contentsField.textContent = self.contentsPlaceholder;
+
+                self.$actionButtonArea.classList.remove('on');
             },
-            delete : function(){
-                var target = event.target;
-                var targetID = target.dataset.id;
-                console.log('[draw] delete target', target)
-                console.log('[draw] delete targetID', targetID)
+            favorite : function(){
+                param.map( item => {
+                    ( item.favorite )
+                    ? qs(`.memo__button--favorite[data-id="${item.id}"]`).classList.add('on')
+                    : qs(`.memo__button--favorite[data-id="${item.id}"]`).classList.remove('on');
+                })
             }
         };
         eventCommand[command]();
     }
 
     View.prototype.generator = function(data){
-        var self = this;
         var memo = '';
-        for( var i=0; i<data.length; i++ ){
+
+        data.forEach(item => {
             var template = this.defaultTemplate;
-                template = template.replace('{{id}}', data[i].id);
-                template = template.replace('{{date}}', data[i].timelog);
-                template = template.replace('{{title}}', data[i].title);
-                template = template.replace('{{contents}}', data[i].contents);
+                template = template.replace(/{{id}}/g, item.id);
+                template = template.replace('{{date}}', item.timelog);
+                template = template.replace('{{title}}', item.title);
+                template = template.replace('{{contents}}', item.contents);
             memo = memo + template;
-        }
+        });
+
         return memo;
     }
 

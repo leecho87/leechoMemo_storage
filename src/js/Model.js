@@ -38,9 +38,18 @@
         return create[getter];
     }
 
-    Model.prototype.read = function(callback){
+    Model.prototype.read = function(callback, flag){
+        var flag = flag || 'all';
         var data = JSON.parse(localStorage.getItem(this.dbName));
-        callback(data);
+        var resultData;
+        if(flag === 'favorite'){
+            resultData = data.filter( item => {
+                return item.favorite === true;
+            });
+        }else{
+            resultData = data;
+        }
+        callback(resultData);
     }
 
     Model.prototype.create = function(parameter, callback){
@@ -49,18 +58,37 @@
 
         parameter = {
             ...parameter,
-            id : self.timeLog('timeId'),
-            timelog : `${self.timeLog('date')}<br>${self.timeLog('time')}`,
+            id : String(self.timeLog('timeId')),
+            timelog : `${self.timeLog('time')}`,
             favorite : false
         }
-
-        data.push(parameter);
+        /*${self.timeLog('date')}<br></br>*/
+        data.unshift(parameter);
         localStorage.setItem(this.dbName, JSON.stringify(data));
         callback(data);
     }
 
-    Model.prototype.delete = function(callback){
-        console.log()
+    Model.prototype.delete = function(id, callback){
+        var data = JSON.parse(localStorage.getItem(this.dbName));
+        var modifyData = data.filter( item => {
+            return item.id != id
+        });
+        localStorage.setItem(this.dbName, JSON.stringify(modifyData));
+        callback();
+    }
+
+    Model.prototype.favorite = function(id, callback){
+        var self = this;
+        var data = JSON.parse(localStorage.getItem(this.dbName));
+        var modifyData = data.map( item => {
+            if(item.id == id) {
+                item.timelog = self.timeLog('time');
+                item.favorite = !item.favorite;
+            }
+            return item;
+        });
+        localStorage.setItem(this.dbName, JSON.stringify(modifyData));
+        callback(modifyData);
     }
 
     exports.app = exports.app || {};

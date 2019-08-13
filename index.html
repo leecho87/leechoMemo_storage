@@ -21,8 +21,11 @@
         <button class="header__action-button" data-action="save">저장</button>
         <button class="header__action-button" data-action="cancel">취소</button>
     </div>
+    <select id="memoSort" class="header__action-select">
+        <option value="all">전체</option>
+        <option value="favorite">즐겨찾기</option>
+    </select>
 </header>
-
 
 <main class="container">
     <section class="memo-wrapper">
@@ -37,10 +40,10 @@
     </section>
 </main>
 
-
-<footer class="footer-wrapper">
+<!-- <footer class="footer-wrapper">
     <p class="footer__copyright">All Rights leecho.</p>
-</footer>
+</footer> -->
+
 <script src="./src/js/helper.js"></script>
 <script src="./src/js/model.js"></script>
 <script src="./src/js/view.js"></script>

@@ -14,7 +14,7 @@
     }
 
     window.$changeHour = function(time){
-        return time < 13 ? '오전 ' + window.$pad(time) : '오후 ' + window.$pad(time%12)
+        return time < 13 ? '[오전] ' + window.$pad(time) : '[오후] ' + window.$pad(time%12)
     }
 
     window.$on = function(target, type, callback){
@@ -26,22 +26,4 @@
             window.$on(item, type, callback);
         });
     }
-
-    window.$delegate = function (target, selector, type, handler) {
-		function dispatchEvent(event) {
-			var targetElement = event.target;
-			var potentialElements = window.qsa(selector, target);
-            console.log('$delegate', targetElement)
-            console.log('$delegate', potentialElements)
-            console.log(Array.prototype.indexOf.call(potentialElements, targetElement))
-			var matchElement = Array.prototype.indexOf.call(potentialElements, targetElement) >= 0;
-
-			if (matchElement) {
-				handler.call(targetElement, event);
-			}
-		}
-
-		window.$on(target, type, dispatchEvent);
-	};
-
 })(window);
