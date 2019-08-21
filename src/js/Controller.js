@@ -11,6 +11,8 @@
         this.view.bind('focusin');
         this.view.bind('blur');
         this.view.bind('keyup');
+        this.view.bind('folding');
+        this.view.bind('newMemoFocus');
         this.view.bind('newMemo', function(param){
             self.addMemo(param);
         });
@@ -22,6 +24,8 @@
 
     Controller.prototype.bindEvents = function(){
         var self = this;
+        this.view.bind('resize');
+
         this.view.bind('memoRemove', function(event){
             self.removeMemo(event);
         });
@@ -30,6 +34,11 @@
             self.favoriteMemo(event);
         });
     }
+
+    Controller.prototype.getCount = function(){
+        var count = this.model.getCount();
+        this.view.draw('count', count);
+    };
 
     Controller.prototype.addMemo = function(parameter){
         var self = this;
@@ -59,20 +68,22 @@
 
     Controller.prototype.changeMemo = function(event){
         var self = this;
-        var category = event.target.value;
+        var category = event.target.dataset.category;
 
-        this.model.read(function(data){
-            self.view.render(data);
-            self.view.draw('favorite', data);
-        }, category);
+        self.refresh(category);
     }
 
-    Controller.prototype.refresh = function(){
+
+
+    Controller.prototype.refresh = function(flag){
         var self = this;
+        var flag = flag || 'all';
+
         this.model.read(function(data){
             self.view.render(data);
             self.view.draw('favorite', data);
-        });
+        }, flag);
+        self.getCount();
         self.bindEvents();
     }
 

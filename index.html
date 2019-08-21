@@ -17,32 +17,81 @@
             <img src="./src/images/thumb.png" alt="" class="header__user-img">
         </span>
     </div>
-    <div class="header__action">
-        <button class="header__action-button" data-action="save">저장</button>
-        <button class="header__action-button" data-action="cancel">취소</button>
-    </div>
-    <select id="memoSort" class="header__action-select">
-        <option value="all">전체</option>
-        <option value="favorite">즐겨찾기</option>
-    </select>
 </header>
 
 <main class="container">
+    <section class="memo-aside">
+        <div class="memo-aside-area">
+            <div class="memo-aside__new">
+                <a href="#" class="memo-aside__button memo-aside__button--new">새 메모</a>
+            </div>
+            <div class="memo-aside__category">
+                <a href="#" data-category="all" class="memo-aside__button memo-aside__button--all">전체 <strong class="count-number count-number--all"></strong></a>
+                <a href="#" data-category="favorite" class="memo-aside__button memo-aside__button--favorite">즐겨찾기 <strong class="count-number count-number--favorite"></strong></a>
+            </div>
+        </div>
+    </section>
+
     <section class="memo-wrapper">
+        <a href="#" class="memo-aside-fold"></a>
         <div class="memo-write-area">
             <div class="memo">
                 <div class="memo__head memo--write" data-field="title" contenteditable="true">제목을 입력해주세요.</div>
                 <div class="memo__body memo--write" data-field="contents" contenteditable="true">내용을 입력해주세요.</div>
             </div>
+            <div class="memo-write__action">
+                <button class="memo-write-save" data-action="save">저장</button>
+            </div>
         </div>
 
         <div class="memo-list-area"></div>
+
+        <div class="memo-modify-area">
+            <div class="memo">
+                <div class="memo__head memo--write" data-field="title" contenteditable="true"></div>
+                <div class="memo__body memo--write" data-field="contents" contenteditable="true"></div>
+            </div>
+            <div class="memo-write__action">
+                <button class="memo-write-save" data-action="save">저장</button>
+            </div>
+        </div>
+
     </section>
 </main>
 
-<!-- <footer class="footer-wrapper">
+<footer class="footer-wrapper">
     <p class="footer__copyright">All Rights leecho.</p>
-</footer> -->
+</footer>
+
+<script id="MemoTemplate" type="text/template">
+    <div class="memo" data-id="{{id}}">
+        <div class="memo__info">
+            <div class="memo__info-text">{{date}}</div>
+            <div class="memo__info-button-wrap">
+                <button type="button" class="memo__button memo__button--favorite" data-id="{{id}}">즐겨찾기</button>
+                <button type="button" class="memo__button memo__button--delete" data-id="{{id}}">삭제</button>
+            </div>
+        </div>
+        <div class="memo__head">{{title}}</div>
+        <div class="memo__body">{{contents}}</div>
+    </div>
+</script>
+
+<script id="Palette" type="text/template">
+    <section class="palette">
+        <a href="#" class="palette__item palette__item--1" data-color="1"></a>
+        <a href="#" class="palette__item palette__item--2" data-color="2"></a>
+        <a href="#" class="palette__item palette__item--3" data-color="3"></a>
+        <a href="#" class="palette__item palette__item--4" data-color="4"></a>
+        <a href="#" class="palette__item palette__item--5" data-color="5"></a>
+        <a href="#" class="palette__item palette__item--6" data-color="6"></a>
+        <a href="#" class="palette__item palette__item--7" data-color="7"></a>
+        <a href="#" class="palette__item palette__item--8" data-color="8"></a>
+        <a href="#" class="palette__item palette__item--9" data-color="9"></a>
+        <a href="#" class="palette__item palette__item--10" data-color="10"></a>
+        <button type="button" class="palette__button">닫기</button>
+    </section>
+</script>
 
 <script src="./src/js/helper.js"></script>
 <script src="./src/js/model.js"></script>

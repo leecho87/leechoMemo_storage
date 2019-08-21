@@ -4,96 +4,122 @@
     var tag = '[View]';
 
     function View(model){
-        this.ENTER_CODE = 13;
         this.model = model;
+        this.ENTER_CODE = 13;
 
         this.titlePlaceholder = '제목을 입력해주세요.';
         this.contentsPlaceholder = '내용을 입력해주세요.';
+        this.$aside = qs('.memo-aside');
+        this.$foldingButton = qs('.memo-aside-fold');
+        this.$actionButtonArea = qs('.memo-write__action');
+        this.$actionButtonSave = qs('[data-action="save"]');
+        this.$newMemoButton = qs('.memo-aside__button--new');
+        this.$memoCount = qsa('.memo-aside__button');
+        this.$memoCountAll = qs('.count-number--all');
+        this.$memoCountFavorite = qs('.count-number--favorite');
+        this.$writeArea = qsa('.memo--write');
+        this.$writeTitle = qsa('.memo__head.memo--write');
+        this.$writeContents = qsa('.memo__body.memo--write');
+        this.$listArea = qs('.memo-list-area');
 
-        this.defaultTemplate =
-        `<div class="memo" data-id="{{id}}">
-            <div class="memo__info">
-                <div class="memo__info-text">{{date}}</div>
-                <div class="memo__info-button-wrap">
-                    <button type="button" class="memo__button memo__button--favorite" data-id="{{id}}">즐겨찾기</button>
-                    <button type="button" class="memo__button memo__button--delete" data-id="{{id}}">삭제</button>
-                </div>
-            </div>
-            <div class="memo__head">{{title}}</div>
-            <div class="memo__body">{{contents}}</div>
-        </div>`;
-
-        this.palette =
-        `<section class="palette">
-            <a href="#" class="palette__item palette__item--1" data-color="1"></a>
-            <a href="#" class="palette__item palette__item--2" data-color="2"></a>
-            <a href="#" class="palette__item palette__item--3" data-color="3"></a>
-            <a href="#" class="palette__item palette__item--4" data-color="4"></a>
-            <a href="#" class="palette__item palette__item--5" data-color="5"></a>
-            <a href="#" class="palette__item palette__item--6" data-color="6"></a>
-            <a href="#" class="palette__item palette__item--7" data-color="7"></a>
-            <a href="#" class="palette__item palette__item--8" data-color="8"></a>
-            <a href="#" class="palette__item palette__item--9" data-color="9"></a>
-            <a href="#" class="palette__item palette__item--10" data-color="10"></a>
-            <button type="button" class="palette__button">닫기</button>
-        </section>`;
+        this.memoTemplate = qs('#MemoTemplate').innerHTML;
+        this.palette = qs('#Palette').innerHTML;
 
         this.pickElements();
     }
 
     View.prototype.pickElements = function(){
-        this.$changeSelect = qs('.header__action-select');
-        this.$actionButtonArea = qs('.header__action');
-        this.$actionButtonSave = qs('[data-action="save"]');
-        this.$actionButtonCancel = qs('[data-action="cancel"]');
-        this.$writeArea = qsa('.memo--write');
-        this.$writeTitle = qsa('.memo__head.memo--write');
-        this.$writeContents = qsa('.memo__body.memo--write');
+        this.$memoItem = qsa('.memo-list-area>.memo');
         this.$memoList = qs('.memo-list-area');
         this.$memoFavorite = qsa('.memo__button--favorite');
         this.$memoDelete = qsa('.memo__button--delete');
     }
 
-    View.prototype.bind = function(event, handler){
+    View.prototype.bind = function(event, callback){
         var self = this;
-
-        if ( event === 'focusin' ) {
-            $multipleEvent(self.$writeArea, 'focus', function(event){
-                self.draw('labelFocus', event)
-            });
-        } else if ( event === 'blur' ) {
-            $multipleEvent(self.$writeArea, 'blur', function(event){
-                self.draw('focusout', event)
-            });
-        } else if ( event === 'keyup' ) {
-            $multipleEvent(self.$writeArea, 'keyup', function(event){
-                self.draw('keyup', event)
-            });
-        } else if ( event === 'newMemo' ) {
-            $on(self.$actionButtonSave, 'click', function(){
-                handler({
-                    title : qs('[data-field="title"]').textContent,
-                    contents : qs('[data-field="contents"]').textContent
+        var eventBind = {
+            resize : function(){
+                $on(window, 'DOMContentLoaded', function(){
+                    self.draw('resize');
                 })
-            });
-        } else if ( event === 'memoRemove' ) {
-            $multipleEvent(self.$memoDelete, 'click', function(event){
-                handler(event);
-            })
-        } else if ( event === 'memoFavorite' ) {
-            $multipleEvent(self.$memoFavorite, 'click', function(event){
-                handler(event);
-            })
-        } else if ( event === 'changeMemo' ) {
-            $on(self.$changeSelect, 'change', function(event){
-                handler(event);
-            })
+            },
+            folding : function(){
+                $on(self.$foldingButton, 'click', function(event){
+                    self.draw('folding', event);
+                });
+            },
+            newMemoFocus : function(){
+                $on(self.$newMemoButton, 'click', function(event){
+                    self.draw('newButtonClick', event)
+                });
+            },
+            focusin : function(){
+                $multipleEvent(self.$writeArea, 'focus', function(event){
+                    self.draw('labelFocus', event)
+                });
+            },
+            blur : function(){
+                $multipleEvent(self.$writeArea, 'blur', function(event){
+                    self.draw('focusout', event)
+                });
+            },
+            keyup : function(){
+                $multipleEvent(self.$writeArea, 'keyup', function(event){
+                    self.draw('keyup', event)
+                });
+            },
+            newMemo : function(){
+                $on(self.$actionButtonSave, 'click', function(){
+                    callback({
+                        title : qs('[data-field="title"]').textContent,
+                        contents : qs('[data-field="contents"]').textContent
+                    })
+                });
+            },
+            memoRemove : function(){
+                $multipleEvent(self.$memoDelete, 'click', function(event){
+                    callback(event);
+                });
+            },
+            memoFavorite : function(){
+                $multipleEvent(self.$memoFavorite, 'click', function(event){
+                    callback(event);
+                });
+            },
+            changeMemo : function(){
+                $multipleEvent(self.$memoCount, 'click', function(event){
+                    event.preventDefault();
+                    callback(event);
+                });
+            },
+            memoModify : function(){
+
+            }
         }
+
+        return eventBind[event]();
     }
 
     View.prototype.draw = function(command, param){
         var self = this;
         var eventCommand = {
+            resize : function(){
+                var windowHeight = window.innerHeight;
+                var gap = ( qs('.header-wrapper').offsetHeight + qs('.footer-wrapper').offsetHeight);
+                qs('.memo-wrapper').style.height = (windowHeight - gap)+'px';
+            },
+            folding : function(){
+                param.preventDefault();
+                qs('.container').classList.contains('on') ? qs('.container').classList.remove('on') : qs('.container').classList.add('on');
+            },
+            newButtonClick : function(){
+                param.preventDefault();
+                qs('[data-field="title"]').focus();
+            },
+            count : function(){
+                self.$memoCountAll.innerHTML = param.all;
+                self.$memoCountFavorite.innerHTML = param.favorite;
+            },
             labelFocus : function(){
                 var target = param.target;
                 var targetText = target.textContent;
@@ -101,7 +127,7 @@
                 if( self.titlePlaceholder === targetText || self.contentsPlaceholder === targetText ){
                     target.textContent = '';
                 }
-
+                self.$listArea.classList.add('on');
                 self.$actionButtonArea.classList.add('on');
             },
             focusout : function(){
@@ -115,6 +141,7 @@
                 }
 
                 if( titleField.textContent === self.titlePlaceholder && contentsField.textContent === self.contentsPlaceholder ){
+                    self.$listArea.classList.remove('on');
                     self.$actionButtonArea.classList.remove('on');
                 }
             },
@@ -130,7 +157,7 @@
                     titleField.textContent = self.titlePlaceholder;
                 var contentsField = qs('[data-field="contents"]');
                     contentsField.textContent = self.contentsPlaceholder;
-
+                self.$listArea.classList.remove('on');
                 self.$actionButtonArea.classList.remove('on');
             },
             favorite : function(){
@@ -141,14 +168,14 @@
                 })
             }
         };
-        eventCommand[command]();
+        return eventCommand[command]();
     }
 
     View.prototype.generator = function(data){
         var memo = '';
 
         data.forEach(item => {
-            var template = this.defaultTemplate;
+            var template = this.memoTemplate;
                 template = template.replace(/{{id}}/g, item.id);
                 template = template.replace('{{date}}', item.timelog);
                 template = template.replace('{{title}}', item.title);
